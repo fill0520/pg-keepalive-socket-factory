@@ -32,7 +32,7 @@ jobs:
       - name: Run Tests
         run: mvn clean test
 
-      - name: Report test coverage to Coveralls
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
         env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        run: mvn coveralls:report
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

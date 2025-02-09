@@ -3,7 +3,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.fill0520/pg-keepalive-socket-factory)](https://central.sonatype.com/artifact/io.github.fill0520/pg-keepalive-socket-factory)
 [![License](https://img.shields.io/github/license/fill0520/pg-keepalive-socket-factory)](LICENSE)
 [![CI](https://github.com/fill0520/pg-keepalive-socket-factory/actions/workflows/ci.yml/badge.svg)](https://github.com/fill0520/pg-keepalive-socket-factory/actions)
-[![Coverage](https://coveralls.io/repos/github/fill0520/pg-keepalive-socket-factory/badge.svg)](https://coveralls.io/github/fill0520/pg-keepalive-socket-factory)
+[![Coverage](https://codecov.io/gh/fill0520/pg-keepalive-socket-factory/branch/main/graph/badge.svg)](https://codecov.io/gh/fill0520/pg-keepalive-socket-factory)
 [![Last Commit](https://img.shields.io/github/last-commit/fill0520/pg-keepalive-socket-factory)](https://github.com/fill0520/pg-keepalive-socket-factory/commits/main)
 [![GitHub stars](https://img.shields.io/github/stars/fill0520/pg-keepalive-socket-factory?style=social)](https://github.com/fill0520/pg-keepalive-socket-factory/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/fill0520/pg-keepalive-socket-factory?style=social)](https://github.com/fill0520/pg-keepalive-socket-factory/network/members)
