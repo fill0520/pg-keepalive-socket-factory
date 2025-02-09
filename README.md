@@ -1,5 +1,14 @@
 # pg-keepalive-socket-factory
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.fill0520/pg-keepalive-socket-factory)](https://central.sonatype.com/artifact/io.github.fill0520/pg-keepalive-socket-factory)
+[![License](https://img.shields.io/github/license/fill0520/pg-keepalive-socket-factory)](LICENSE)
+[![CI](https://github.com/fill0520/pg-keepalive-socket-factory/actions/workflows/ci.yml/badge.svg)](https://github.com/fill0520/pg-keepalive-socket-factory/actions)
+[![Coverage](https://coveralls.io/repos/github/fill0520/pg-keepalive-socket-factory/badge.svg)](https://coveralls.io/github/fill0520/pg-keepalive-socket-factory)
+[![Last Commit](https://img.shields.io/github/last-commit/fill0520/pg-keepalive-socket-factory)](https://github.com/fill0520/pg-keepalive-socket-factory/commits/main)
+[![GitHub stars](https://img.shields.io/github/stars/fill0520/pg-keepalive-socket-factory?style=social)](https://github.com/fill0520/pg-keepalive-socket-factory/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/fill0520/pg-keepalive-socket-factory?style=social)](https://github.com/fill0520/pg-keepalive-socket-factory/network/members)
+
+
 **pg-keepalive-socket-factory** is a Java library that provides a custom JDBC `SocketFactory` for PostgreSQL with advanced TCP keep-alive configuration. By leveraging `ExtendedSocketOptions`, it allows fine-grained control over important keep-alive properties (such as idle time, interval, and maximum retry count). This is especially useful in production environments where reliable, persistent connections are critical.
 
 ---
