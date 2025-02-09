@@ -35,4 +35,4 @@ jobs:
       - name: Report test coverage to Coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        run: mvn jacoco:report coveralls:report
+        run: mvn coveralls:report
