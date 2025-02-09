@@ -1,0 +1,36 @@
+# Ignore Maven target directory
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# Eclipse/IDEA specific
+*.iml
+*.ipr
+*.iws
+.idea/
+.classpath
+.project
+.settings/
+
+# IntelliJ IDEA specific
+out/
+*.swp
+
+# NetBeans specific
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+*.bak
+*.log
+
+# VS Code specific
+.vscode/
+
+# OS generated files
+.DS_Store
+Thumbs.db
