@@ -3,7 +3,8 @@ package io.github.fill0520.pgkeepalivesocketfactory;
 import jdk.net.ExtendedSocketOptions;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
-
+import java.lang.reflect.Field;
+import java.util.Map;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -136,14 +137,44 @@ public class PgKeepAliveSocketFactoryTest {
     @Test
     void testInvalidBooleanValue() throws IOException {
         Properties props = new Properties();
-        props.setProperty("keepAlive", "notaboolean");
+        props.setProperty("keepAlive", "notaboolean"); // Invalid boolean value
+
+        // Capture stderr output
+        ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+        PrintStream originalErr = System.err;
+        System.setErr(new PrintStream(errContent));
 
         PgKeepAliveSocketFactory factory = new PgKeepAliveSocketFactory(props);
 
+        // Restore stderr
+        System.setErr(originalErr);
+
+        // Verify that a warning message was logged
+        String errorOutput = errContent.toString();
+        assertTrue(errorOutput.contains("Warning: Invalid boolean value for keepAlive"),
+            "Expected warning about invalid boolean value to be logged. Actual output: " + errorOutput);
+
+        // Access the private field configValues using Reflection
+        try {
+            Field field = PgKeepAliveSocketFactory.class.getDeclaredField("configValues");
+            field.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> configValues = (Map<String, Object>) field.get(factory);
+
+            // Ensure that keepAlive was stored as false (default)
+            assertTrue(configValues.containsKey("keepAlive"), "keepAlive should still exist in configValues.");
+            assertFalse((Boolean) configValues.get("keepAlive"), "keepAlive should default to false for invalid input.");
+
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            fail("Reflection failed to access configValues: " + e.getMessage());
+        }
+
+        // Create a socket to ensure that execution continues without failure
         Socket s = factory.createSocket();
         assertNotNull(s, "Socket should be created even with an invalid boolean property.");
         assertFalse(s.getKeepAlive(), "Expected keepAlive to default to false for invalid boolean input.");
     }
+
 
     /**
      * This test covers the scenario where a keep-alive setting is out of the allowed range,
@@ -172,14 +203,39 @@ public class PgKeepAliveSocketFactoryTest {
     void testParseInvalidIntegerValue() throws IOException {
         Properties props = new Properties();
         props.setProperty("keepAlive", "true");
-        props.setProperty("keepAliveIdle", "notanumber");
+        props.setProperty("keepAliveIdle", "notanumber"); // Invalid integer value
+
+        // Capture stderr output
+        ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+        PrintStream originalErr = System.err;
+        System.setErr(new PrintStream(errContent));
 
         PgKeepAliveSocketFactory factory = new PgKeepAliveSocketFactory(props);
 
-        // Create a socket to trigger configureSocket
+        // Restore stderr
+        System.setErr(originalErr);
+
+        // Verify that a warning message was logged
+        String errorOutput = errContent.toString();
+        assertTrue(errorOutput.contains("Warning: Invalid integer value for keepAliveIdle"),
+            "Expected warning about invalid integer value to be logged. Actual output: " + errorOutput);
+
+        // Access the private field configValues using Reflection
+        try {
+            Field field = PgKeepAliveSocketFactory.class.getDeclaredField("configValues");
+            field.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> configValues = (Map<String, Object>) field.get(factory);
+
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            fail("Reflection failed to access configValues: " + e.getMessage());
+        }
+
+        // Create a socket to ensure that execution continues without failure
         Socket s = factory.createSocket();
         assertNotNull(s, "Socket should still be created even if a keep-alive property is not a valid integer.");
     }
+
 
     /**
      * This test covers all the overloaded createSocket(...) methods to ensure each one is invoked

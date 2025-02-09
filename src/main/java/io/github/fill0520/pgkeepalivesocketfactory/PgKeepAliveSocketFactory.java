@@ -10,12 +10,16 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.net.InetAddress;
+
 
 /**
  * PgKeepAliveSocketFactory provides a configurable socket factory for establishing connections with PostgreSQL.
  * It allows setting socket options such as keep-alive settings using Java's ExtendedSocketOptions.
  */
 public class PgKeepAliveSocketFactory extends SocketFactory {
+
+    private final SocketFactory defaultFactory = SocketFactory.getDefault();
 
     /**
      * Stores all created sockets for potential tracking or cleanup.
@@ -49,10 +53,6 @@ public class PgKeepAliveSocketFactory extends SocketFactory {
     private void loadProperties(Properties props) {
         for (String key : props.stringPropertyNames()) {
             String value = props.getProperty(key);
-            if (value == null) {
-                System.err.println("Warning: Property " + key + " is null and will be ignored.");
-                continue;
-            }
             switch (key) {
                 case "keepAlive":
                     configValues.put(key, parseBooleanProperty(key, value));
@@ -96,49 +96,39 @@ public class PgKeepAliveSocketFactory extends SocketFactory {
 
     @Override
     public Socket createSocket() throws IOException {
-        Socket socket = new Socket();
+        Socket socket = defaultFactory.createSocket();
         configureSocket(socket);
-        sockets.add(socket);
         return socket;
     }
 
     @Override
     public Socket createSocket(String host, int port) throws IOException {
-        Socket socket = new Socket();
+        Socket socket = defaultFactory.createSocket(host, port);
         configureSocket(socket);
-        socket.connect(new InetSocketAddress(host, port));
-        sockets.add(socket);
         return socket;
     }
 
     @Override
-    public Socket createSocket(String host, int port, java.net.InetAddress localHost, int localPort) throws IOException {
-        Socket socket = new Socket();
+    public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
+        Socket socket = defaultFactory.createSocket(host, port, localHost, localPort);
         configureSocket(socket);
-        socket.bind(new InetSocketAddress(localHost, localPort));
-        socket.connect(new InetSocketAddress(host, port));
-        sockets.add(socket);
         return socket;
     }
 
     @Override
-    public Socket createSocket(java.net.InetAddress host, int port) throws IOException {
-        Socket socket = new Socket();
+    public Socket createSocket(InetAddress host, int port) throws IOException {
+        Socket socket = defaultFactory.createSocket(host, port);
         configureSocket(socket);
-        socket.connect(new InetSocketAddress(host, port));
-        sockets.add(socket);
         return socket;
     }
 
     @Override
-    public Socket createSocket(java.net.InetAddress address, int port, java.net.InetAddress localAddress, int localPort) throws IOException {
-        Socket socket = new Socket();
+    public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
+        Socket socket = defaultFactory.createSocket(address, port, localAddress, localPort);
         configureSocket(socket);
-        socket.bind(new InetSocketAddress(localAddress, localPort));
-        socket.connect(new InetSocketAddress(address, port));
-        sockets.add(socket);
         return socket;
     }
+
 
     private void configureSocket(Socket socket) throws IOException {
         Boolean keepAlive = (Boolean) configValues.get("keepAlive");
@@ -160,6 +150,7 @@ public class PgKeepAliveSocketFactory extends SocketFactory {
                 }
             }
         }
+        sockets.add(socket);
     }
 
     /**
