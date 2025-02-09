@@ -29,10 +29,12 @@ jobs:
           key: maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: maven-
 
-      - name: Run Tests
-        run: mvn clean test
+      - name: Run Tests and Generate Coverage Report
+        run: mvn clean verify
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: target/site/jacoco/jacoco.xml
+          verbose: true
