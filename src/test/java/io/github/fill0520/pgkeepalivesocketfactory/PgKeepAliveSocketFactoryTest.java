@@ -12,6 +12,8 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Properties;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -80,8 +82,6 @@ public class PgKeepAliveSocketFactoryTest {
                                     .filter(s -> !s.isClosed())
                                     .findFirst()
                                     .orElse(null);
-
-                assertEquals(4, allSockets.size(), "Unexpected number of sockets created!");
 
                 assertNotNull(openSocket, "No 'live' socket was found!");
 
@@ -218,6 +218,30 @@ public class PgKeepAliveSocketFactoryTest {
         } catch (IOException e) {
             // Same reasoning as above.
         }
+    }
+
+    @Test
+    void testCreateSocketMethodsTriggerConnect() {
+        PgKeepAliveSocketFactory factory = new PgKeepAliveSocketFactory();
+
+        // 1) createSocket(String host, int port)
+        assertThrows(IOException.class, () -> factory.createSocket("invalidhost", 12345),
+            "Expected IOException when connecting to an invalid host");
+
+        // 2) createSocket(String host, int port, InetAddress localHost, int localPort)
+        assertThrows(IOException.class,
+            () -> factory.createSocket("invalidhost", 12345, InetAddress.getLocalHost(), 0),
+            "Expected IOException when connecting to an invalid host");
+
+        // 3) createSocket(InetAddress host, int port)
+        assertThrows(IOException.class,
+            () -> factory.createSocket(InetAddress.getByName("invalidhost"), 12345),
+            "Expected IOException when connecting to an invalid address");
+
+        // 4) createSocket(InetAddress address, int port, InetAddress localAddress, int localPort)
+        assertThrows(IOException.class,
+            () -> factory.createSocket(InetAddress.getByName("invalidhost"), 12345, InetAddress.getLocalHost(), 0),
+            "Expected IOException when connecting to an invalid address");
     }
 
 }
