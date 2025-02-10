@@ -21,7 +21,7 @@
 ---
 
 ## Requirements
-- **Java 8+** (Recommended Java 11+ for robust `ExtendedSocketOptions` support).
+- **Java 23+**.
 - **PostgreSQL JDBC Driver** (e.g., `org.postgresql:postgresql`).
 
 > **Note**: Certain `ExtendedSocketOptions` may not be available on all JVMs or operating systems. If unsupported, a warning will be logged.
@@ -50,31 +50,20 @@ You’ll typically provide custom socket factory options through the JDBC `Prope
 ```java
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.Properties;
 
 public class Example {
     public static void main(String[] args) throws Exception {
-        Properties props = new Properties();
-        // Specify the custom socket factory class
-        props.setProperty("socketFactory", "io.github.fill0520.pgkeepalivesocketfactory.PgKeepAliveSocketFactory");
+        String url = "jdbc:postgresql://localhost:5432/test?"
+        + "user=test_user&"
+        + "password=password123&"
+        + "socketFactory=io.github.fill0520.pgkeepalivesocketfactory.PgKeepAliveSocketFactory&"
+        + "keepAlive=true&"
+        + "keepAliveIdle=60&"
+        + "keepAliveInterval=15&"
+        + "keepAliveCount=5";
 
-        // Enable keep-alive
-        props.setProperty("keepAlive", "true");
-        // Optional: keepAliveIdle in seconds (some OSes interpret it differently)
-        props.setProperty("keepAliveIdle", "60");
-        // Optional: keepAliveInterval in seconds
-        props.setProperty("keepAliveInterval", "15");
-        // Optional: keepAliveCount (retries before killing connection)
-        props.setProperty("keepAliveCount", "5");
-
-        // Provide other usual PostgreSQL settings
-        props.setProperty("user", "postgres");
-        props.setProperty("password", "secret");
-
-        String url = "jdbc:postgresql://localhost:5432/mydatabase";
-        try (Connection conn = DriverManager.getConnection(url, props)) {
+        try (Connection conn = DriverManager.getConnection(url)) {
             System.out.println("Connected using custom keep-alive socket factory!");
-            // Use the connection...
         }
     }
 }
