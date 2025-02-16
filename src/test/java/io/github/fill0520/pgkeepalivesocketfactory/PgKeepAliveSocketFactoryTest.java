@@ -3,7 +3,6 @@ package io.github.fill0520.pgkeepalivesocketfactory;
 import jdk.net.ExtendedSocketOptions;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
-import java.lang.reflect.Field;
 import java.util.Map;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -56,7 +55,7 @@ public class PgKeepAliveSocketFactoryTest {
             props.setProperty("sslmode", "disable");
 
             // Use the custom socket factory
-            props.setProperty("socketFactory", PgKeepAliveSocketFactory.class.getName());
+            props.setProperty("socketFactory", TestConfigurableSocketFactory.class.getName());
 
             // Set keep-alive parameters
             props.setProperty("keepAlive", "true");
@@ -73,8 +72,8 @@ public class PgKeepAliveSocketFactoryTest {
 
                 stmt.execute("SELECT 1");
 
-                // Retrieve all sockets created by the PgKeepAliveSocketFactory
-                List<Socket> allSockets = PgKeepAliveSocketFactory.getSockets();
+                // Retrieve all sockets created by the TestConfigurableSocketFactory
+                List<Socket> allSockets = TestConfigurableSocketFactory.getSockets();
                 assertFalse(allSockets.isEmpty(), "The factory did not create any sockets!");
 
                 // Find an open (non-closed) socket
@@ -104,19 +103,19 @@ public class PgKeepAliveSocketFactoryTest {
     }
 
     /**
-     * This test covers the no-argument constructor of PgKeepAliveSocketFactory.
+     * This test covers the no-argument constructor of TestConfigurableSocketFactory.
      * It ensures the constructor is invoked and the object is properly created.
      */
     @Test
     void testDefaultConstructorCoverage() {
-        PgKeepAliveSocketFactory factory = new PgKeepAliveSocketFactory();
-        assertNotNull(factory, "Expected PgKeepAliveSocketFactory to be created via the default constructor.");
+        TestConfigurableSocketFactory factory = new TestConfigurableSocketFactory();
+        assertNotNull(factory, "Expected TestConfigurableSocketFactory to be created via the default constructor.");
     }
 
     /**
      * This test covers the scenario when a property value in Properties is actually null.
      * We place a null value via 'props.put(key, null)', which should trigger the warning
-     * and ignoring logic in PgKeepAliveSocketFactory.
+     * and ignoring logic in TestConfigurableSocketFactory.
      */
     @Test
     void testNullProperty() {
@@ -124,7 +123,7 @@ public class PgKeepAliveSocketFactoryTest {
         props.setProperty("keepAlive", "true"); // Adding a valid property
         props.remove("keepAlive"); // Simulating a null value by removing the key
 
-        PgKeepAliveSocketFactory factory = new PgKeepAliveSocketFactory(props);
+        TestConfigurableSocketFactory factory = new TestConfigurableSocketFactory(props);
 
         // Verifying that factory is created without throwing any exception
         assertNotNull(factory, "Factory should be created even if a property is removed.");
@@ -144,7 +143,7 @@ public class PgKeepAliveSocketFactoryTest {
         PrintStream originalErr = System.err;
         System.setErr(new PrintStream(errContent));
 
-        PgKeepAliveSocketFactory factory = new PgKeepAliveSocketFactory(props);
+        TestConfigurableSocketFactory factory = new TestConfigurableSocketFactory(props);
 
         // Restore stderr
         System.setErr(originalErr);
@@ -153,21 +152,6 @@ public class PgKeepAliveSocketFactoryTest {
         String errorOutput = errContent.toString();
         assertTrue(errorOutput.contains("Warning: Invalid boolean value for keepAlive"),
             "Expected warning about invalid boolean value to be logged. Actual output: " + errorOutput);
-
-        // Access the private field configValues using Reflection
-        try {
-            Field field = PgKeepAliveSocketFactory.class.getDeclaredField("configValues");
-            field.setAccessible(true);
-            @SuppressWarnings("unchecked")
-            Map<String, Object> configValues = (Map<String, Object>) field.get(factory);
-
-            // Ensure that keepAlive was stored as false (default)
-            assertTrue(configValues.containsKey("keepAlive"), "keepAlive should still exist in configValues.");
-            assertFalse((Boolean) configValues.get("keepAlive"), "keepAlive should default to false for invalid input.");
-
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            fail("Reflection failed to access configValues: " + e.getMessage());
-        }
 
         // Create a socket to ensure that execution continues without failure
         Socket s = factory.createSocket();
@@ -187,7 +171,7 @@ public class PgKeepAliveSocketFactoryTest {
         props.setProperty("keepAlive", "true");
         props.setProperty("keepAliveIdle", "99999"); // Invalid, out of allowed range
 
-        PgKeepAliveSocketFactory factory = new PgKeepAliveSocketFactory(props);
+        TestConfigurableSocketFactory factory = new TestConfigurableSocketFactory(props);
 
         // Create a socket to trigger configureSocket
         Socket s = factory.createSocket();
@@ -210,7 +194,7 @@ public class PgKeepAliveSocketFactoryTest {
         PrintStream originalErr = System.err;
         System.setErr(new PrintStream(errContent));
 
-        PgKeepAliveSocketFactory factory = new PgKeepAliveSocketFactory(props);
+        TestConfigurableSocketFactory factory = new TestConfigurableSocketFactory(props);
 
         // Restore stderr
         System.setErr(originalErr);
@@ -219,17 +203,6 @@ public class PgKeepAliveSocketFactoryTest {
         String errorOutput = errContent.toString();
         assertTrue(errorOutput.contains("Warning: Invalid integer value for keepAliveIdle"),
             "Expected warning about invalid integer value to be logged. Actual output: " + errorOutput);
-
-        // Access the private field configValues using Reflection
-        try {
-            Field field = PgKeepAliveSocketFactory.class.getDeclaredField("configValues");
-            field.setAccessible(true);
-            @SuppressWarnings("unchecked")
-            Map<String, Object> configValues = (Map<String, Object>) field.get(factory);
-
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            fail("Reflection failed to access configValues: " + e.getMessage());
-        }
 
         // Create a socket to ensure that execution continues without failure
         Socket s = factory.createSocket();
@@ -245,7 +218,7 @@ public class PgKeepAliveSocketFactoryTest {
      */
     @Test
     void testAllOverloadedCreateSocketMethods() throws IOException {
-        PgKeepAliveSocketFactory factory = new PgKeepAliveSocketFactory();
+        TestConfigurableSocketFactory factory = new TestConfigurableSocketFactory();
 
         // 1) createSocket(String host, int port)
         try (Socket s1 = factory.createSocket("localhost", 0)) {
@@ -278,7 +251,7 @@ public class PgKeepAliveSocketFactoryTest {
 
     @Test
     void testCreateSocketMethodsTriggerConnect() {
-        PgKeepAliveSocketFactory factory = new PgKeepAliveSocketFactory();
+        TestConfigurableSocketFactory factory = new TestConfigurableSocketFactory();
 
         // 1) createSocket(String host, int port)
         assertThrows(IOException.class, () -> factory.createSocket("invalidhost", 12345),

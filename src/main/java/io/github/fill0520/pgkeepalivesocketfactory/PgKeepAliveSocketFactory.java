@@ -8,8 +8,6 @@ import javax.net.SocketFactory;
 import jdk.net.ExtendedSocketOptions;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.List;
 import java.net.InetAddress;
 
 
@@ -18,14 +16,6 @@ import java.net.InetAddress;
  * It allows setting socket options such as keep-alive settings using Java's ExtendedSocketOptions.
  */
 public class PgKeepAliveSocketFactory extends SocketFactory {
-
-    private final SocketFactory defaultFactory = SocketFactory.getDefault();
-
-    /**
-     * Stores all created sockets for potential tracking or cleanup.
-     */
-    public static final List<Socket> sockets = new ArrayList<>();
-
     /**
      * Defines allowable ranges for keep-alive settings.
      */
@@ -96,41 +86,45 @@ public class PgKeepAliveSocketFactory extends SocketFactory {
 
     @Override
     public Socket createSocket() throws IOException {
-        Socket socket = defaultFactory.createSocket();
+        Socket socket = new Socket();
         configureSocket(socket);
         return socket;
     }
 
     @Override
     public Socket createSocket(String host, int port) throws IOException {
-        Socket socket = defaultFactory.createSocket(host, port);
+        Socket socket = new Socket(host, port);
         configureSocket(socket);
         return socket;
     }
 
     @Override
     public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
-        Socket socket = defaultFactory.createSocket(host, port, localHost, localPort);
+        Socket socket = new Socket();
+        socket.bind(new InetSocketAddress(localHost, localPort));
+        socket.connect(new InetSocketAddress(host, port));
         configureSocket(socket);
         return socket;
     }
 
     @Override
     public Socket createSocket(InetAddress host, int port) throws IOException {
-        Socket socket = defaultFactory.createSocket(host, port);
+        Socket socket = new Socket(host, port);
         configureSocket(socket);
         return socket;
     }
 
     @Override
     public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
-        Socket socket = defaultFactory.createSocket(address, port, localAddress, localPort);
+        Socket socket = new Socket();
+        socket.bind(new InetSocketAddress(localAddress, localPort));
+        socket.connect(new InetSocketAddress(address, port));
         configureSocket(socket);
         return socket;
     }
 
 
-    private void configureSocket(Socket socket) throws IOException {
+    protected void configureSocket(Socket socket) throws IOException {
         Boolean keepAlive = (Boolean) configValues.get("keepAlive");
         if (keepAlive != null) {
             socket.setKeepAlive(keepAlive);
@@ -150,13 +144,5 @@ public class PgKeepAliveSocketFactory extends SocketFactory {
                 }
             }
         }
-        sockets.add(socket);
-    }
-
-    /**
-     * Retrieves the list of all created sockets.
-     */
-    public static List<Socket> getSockets() {
-        return sockets;
     }
 }
