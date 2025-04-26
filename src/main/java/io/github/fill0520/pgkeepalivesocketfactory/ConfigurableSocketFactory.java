@@ -1,4 +1,4 @@
-package io.github.fill0520.pgkeepalivesocketfactory;
+package io.github.fill0520.configurablesocketfactory;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -12,10 +12,10 @@ import java.net.InetAddress;
 
 
 /**
- * PgKeepAliveSocketFactory provides a configurable socket factory for establishing connections with PostgreSQL.
+ * ConfigurableSocketFactory provides a configurable socket factory for establishing connections with PostgreSQL.
  * It allows setting socket options such as keep-alive settings using Java's ExtendedSocketOptions.
  */
-public class PgKeepAliveSocketFactory extends SocketFactory {
+public class ConfigurableSocketFactory extends SocketFactory {
     /**
      * Defines allowable ranges for keep-alive settings.
      */
@@ -30,13 +30,13 @@ public class PgKeepAliveSocketFactory extends SocketFactory {
      */
     private final Map<String, Object> configValues = new HashMap<>();
 
-    public PgKeepAliveSocketFactory() {}
+    public ConfigurableSocketFactory() {}
 
     /**
-     * Constructs a PgKeepAliveSocketFactory with given properties.
+     * Constructs a ConfigurableSocketFactory with given properties.
      * @param props Properties object containing socket configuration values.
      */
-    public PgKeepAliveSocketFactory(Properties props) {
+    public ConfigurableSocketFactory(Properties props) {
         this.loadProperties(props);
     }
 

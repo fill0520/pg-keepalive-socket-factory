@@ -1,4 +1,4 @@
-# pg-keepalive-socket-factory
+# configurable-socket-factory
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.fill0520/pg-keepalive-socket-factory)](https://central.sonatype.com/artifact/io.github.fill0520/pg-keepalive-socket-factory)
 [![License](https://img.shields.io/github/license/fill0520/pg-keepalive-socket-factory)](LICENSE)
@@ -9,11 +9,11 @@
 [![GitHub forks](https://img.shields.io/github/forks/fill0520/pg-keepalive-socket-factory?style=social)](https://github.com/fill0520/pg-keepalive-socket-factory/network/members)
 
 
-**pg-keepalive-socket-factory** is a Java library that provides a custom JDBC `SocketFactory` for PostgreSQL with advanced TCP keep-alive configuration. By leveraging `ExtendedSocketOptions`, it allows fine-grained control over important keep-alive properties (such as idle time, interval, and maximum retry count). This is especially useful in production environments where reliable, persistent connections are critical.
+**configurable-socket-factory** is a Java library that provides a custom JDBC `SocketFactory` for PostgreSQL with advanced TCP keep-alive configuration. By leveraging `ExtendedSocketOptions`, it allows fine-grained control over important keep-alive properties (such as idle time, interval, and maximum retry count). This is especially useful in production environments where reliable, persistent connections are critical.
 
 ---
 
-## Why Use pg-keepalive-socket-factory?
+## Why Use configurable-socket-factory?
 - **Fine-Tuned Keep-Alive**: Avoid dropped connections by setting custom TCP keep-alive parameters (e.g., idle period, interval, retry count).
 - **Easy Integration**: Simply set a few properties and specify the custom socket factory in your JDBC connection.
 - **Better Stability**: Especially helpful in containers, Kubernetes, or any network environments prone to silent disconnections.
@@ -21,7 +21,7 @@
 ---
 
 ## Requirements
-- **Java 23+**.
+- **Java 11+**.
 - **PostgreSQL JDBC Driver** (e.g., `org.postgresql:postgresql`).
 
 > **Note**: Certain `ExtendedSocketOptions` may not be available on all JVMs or operating systems. If unsupported, a warning will be logged.
@@ -32,20 +32,20 @@
 
 ### 1. Add the Dependency
 
-pg-keepalive-socket-factory is available in **Maven Central**. Add it to your project:
+configurable-socket-factory is available in **Maven Central**. Add it to your project:
 
 **Maven**
 ```xml
 <dependency>
-    <groupId>io.github.fill0520.pgkeepalivesocketfactory</groupId>
-    <artifactId>pg-keepalive-socket-factory</artifactId>
+    <groupId>io.github.fill0520.configurablesocketfactory</groupId>
+    <artifactId>configurable-socket-factory</artifactId>
     <version>1.0.0</version>
 </dependency>
 ```
 
-### 2. Configure Your Connection
+# 2. Usage Examples
 
-You’ll typically provide custom socket factory options through the JDBC `Properties` object:
+## Plain JDBC Example
 
 ```java
 import java.sql.Connection;
@@ -56,7 +56,7 @@ public class Example {
         String url = "jdbc:postgresql://localhost:5432/test?"
         + "user=test_user&"
         + "password=password123&"
-        + "socketFactory=io.github.fill0520.pgkeepalivesocketfactory.PgKeepAliveSocketFactory&"
+        + "socketFactory=io.github.fill0520.configurablesocketfactory.ConfigurableSocketFactory&"
         + "keepAlive=true&"
         + "keepAliveIdle=60&"
         + "keepAliveInterval=15&"
@@ -69,14 +69,50 @@ public class Example {
 }
 ```
 
-Once set, the library automatically applies the custom keep-alive parameters upon socket creation.
+## Spring Integration Example
+
+You can also integrate `configurable-socket-factory` with Spring applications by configuring the datasource properly.
+
+### Example using `application.properties`:
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/test?socketFactory=io.github.fill0520.configurablesocketfactory.ConfigurableSocketFactory&keepAlive=true&keepAliveIdle=60&keepAliveInterval=15&keepAliveCount=5
+spring.datasource.username=test_user
+spring.datasource.password=password123
+spring.datasource.driver-class-name=org.postgresql.Driver
+```
+
+Spring Boot will automatically pick up this configuration and apply the custom socket factory at connection time.
+
+### Example Java-based Configuration:
+
+```java
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.jdbc.DataSourceBuilder;
+
+import javax.sql.DataSource;
+
+@Configuration
+public class DataSourceConfig {
+    @Bean
+    public DataSource dataSource() {
+        return DataSourceBuilder.create()
+            .url("jdbc:postgresql://localhost:5432/test?socketFactory=io.github.fill0520.configurablesocketfactory.ConfigurableSocketFactory&keepAlive=true&keepAliveIdle=60&keepAliveInterval=15&keepAliveCount=5")
+            .username("test_user")
+            .password("password123")
+            .driverClassName("org.postgresql.Driver")
+            .build();
+    }
+}
+```
 
 ---
 
 ## Configuration Properties
 
 - **`socketFactory`** (required)
-  - Must be `io.github.fill0520.pgkeepalivesocketfactory.PgKeepAliveSocketFactory`.
+  - Must be `io.github.fill0520.configurablesocketfactory.ConfigurableSocketFactory`.
 
 - **`keepAlive`** (`true` / `false`)
   - When enabled (`true`), TCP keep-alive is turned on.

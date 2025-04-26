@@ -1,4 +1,4 @@
-package io.github.fill0520.pgkeepalivesocketfactory;
+package io.github.fill0520.configurablesocketfactory;
 
 import jdk.net.ExtendedSocketOptions;
 import org.junit.jupiter.api.Test;
@@ -30,10 +30,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * the test will catch an {@link UnsupportedOperationException} and log a warning message.
  * </p>
  */
-public class PgKeepAliveSocketFactoryTest {
+public class ConfigurableSocketFactoryTest {
 
     /**
-     * Tests that the {@link PgKeepAliveSocketFactory} creates sockets with the correct
+     * Tests that the {@link ConfigurableSocketFactory} creates sockets with the correct
      * keep-alive configuration when connecting to a PostgreSQL database.
      *
      * @throws Exception if any error occurs while setting up or interacting with the database

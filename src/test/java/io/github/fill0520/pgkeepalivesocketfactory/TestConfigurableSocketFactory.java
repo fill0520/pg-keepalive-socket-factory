@@ -1,4 +1,4 @@
-package io.github.fill0520.pgkeepalivesocketfactory;
+package io.github.fill0520.configurablesocketfactory;
 
 
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class TestConfigurableSocketFactory extends PgKeepAliveSocketFactory {
+public class TestConfigurableSocketFactory extends ConfigurableSocketFactory {
     public static final List<Socket> sockets = new ArrayList<>();
 
     public TestConfigurableSocketFactory() {
